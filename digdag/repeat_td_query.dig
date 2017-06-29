@@ -1,0 +1,23 @@
+timezone: UTC
+
+_export:
+  td:
+    database: toru_benchmark
+
++repeating:
+  for_each>:
+    tbl_name: [test1000, test10000, test100000, test1000000, test10000000, test100000000]
+  _do:
+    +looping:
+      loop>: 3
+      _do:
+        +step1:
+          td>:
+          query: 'INSERT INTO test SELECT * FROM ${tbl_name}'
+        +step1_result:
+          sh>: echo "${tbl_name},${td.last_job_id}" >> result.txt
+        +step2:
+          td>:
+          query: 'INSERT INTO test SELECT * FROM ${tbl_name} ORDER BY page_rank'
+        +step2_result:
+          sh>: echo "${tbl_name},${td.last_job_id}" >> result.txt
